@@ -1,21 +1,28 @@
 #ifndef PS4_CONTROL_TASK_H
 #define PS4_CONTROL_TASK_H
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-#include "esp_log.h"
-#include <Arduino.h>
-
 #include <PS4Controller.h>
-#include "esp_bt_main.h"
-#include "esp_bt_device.h"
-#include "esp_gap_bt_api.h"
-#include "esp_err.h"
+#include "Arduino.h"
 
+#define PS4_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
+#define PS4_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
 
-#define PS4_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 8192
-#define PS4_TASK_PRIORITY ( tskIDLE_PRIORITY + 3UL )
+extern xSemaphoreHandle xSeedSemaphore;
+extern xSemaphoreHandle xPS4Semaphore;
+extern xQueueHandle xMotorControlQueue;
+extern uint8_t seed_drop_finished;
+
+struct knob_values{
+    int8_t left_x;
+    int8_t left_y;
+    int8_t right_x;
+    int8_t right_y;
+
+};
+
 
 void ps4_control_task(__unused void *params);
+void on_connect();
+
 
 #endif //PS4_CONTROL_TASK_H
