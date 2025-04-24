@@ -4,25 +4,44 @@
 #include "Arduino.h"
 
 //DEFINE
-#define MOT_LEFT_PIN_IN1 32
-#define MOT_LEFT_PIN_IN2 34
-#define MOT_LEFT_PIN_PWM 35
+#define MOTOR_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
+#define MOTOR_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+
+#define MOT_LEFT_PIN_IN1 23
+#define MOT_LEFT_PIN_IN2 22
+#define MOT_LEFT_PIN_PWM 17
 #define MOT_LEFT_PWM_CH 0
 
-#define MOT_RIGHT_PIN_IN1 26
-#define MOT_RIGHT_PIN_IN2 25
-#define MOT_RIGHT_PIN_PWM 33
+#define MOT_RIGHT_PIN_IN1 19
+#define MOT_RIGHT_PIN_IN2 21
+#define MOT_RIGHT_PIN_PWM 16
 #define MOT_RIGHT_PWM_CH 1
  
+//Po jakiej stronie pojazdu są silniki (ma znaczenie przy wykonywaniu zakrętów)
+#define MOT_LEFT 0  
+#define MOT_RIGHT 1
+
+//Wartości knob poniżej KNOB_SENSITIVITY będą traktowane jako szum.
+#define KNOB_SENSITIVITY 5
 
 extern xQueueHandle xMotorControlQueue;
 
-struct Motor {
-    const uint8_t PIN_IN1, PIN_IN2, PIN_PWM;
-    uint8_t VAL_IN1, VAL_IN2, VAL_PWM;
-    Motor(uint8_t IN1, uint8_t IN2, uint8_t PWM, uint8_t PWM_CH);
+typedef struct {
+    uint8_t pwm_left;
+    uint8_t pwm_right;
+    bool dir_left;
+    bool dir_right;
+} motor_control_signal_t;
 
-    void set_direction(const uint8_t knob_left_x, const uint8_t knob_left_y);
+
+class Motor {
+    const uint8_t pin_in1, pin_in2, pin_pwm, pwm_ch;
+
+public:
+    Motor(uint8_t in1, uint8_t in2, uint8_t pwm, uint8_t pwm_ch);
+
+    void update(bool dir, uint8_t duty);
+    static motor_control_signal_t calculate_motor_output(int8_t forward, int8_t turn);
 };
 
 void motor_control_task(__unused void *params);
