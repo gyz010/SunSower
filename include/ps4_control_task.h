@@ -10,7 +10,7 @@
 extern xSemaphoreHandle xSeedSemaphore;
 extern xSemaphoreHandle xPS4Semaphore;
 extern xQueueHandle xMotorControlQueue;
-extern uint8_t seed_drop_finished;
+extern bool seed_drop_finished;
 
 struct knob_values{
     int8_t left_x;
@@ -23,6 +23,7 @@ struct knob_values{
 
 void ps4_control_task(__unused void *params);
 void on_connect();
+void on_disconnect();
 
 
 #endif //PS4_CONTROL_TASK_H
