@@ -18,9 +18,9 @@ void seed_release_task(__unused void *params) {
             seed_drop_finished = false;
             Serial.println("Seed");
             servo.write(servo_open);
-            vTaskDelay(servo_delay);
+            vTaskDelay(pdMS_TO_TICKS(servo_delay));
             servo.write(servo_closed);
-            vTaskDelay(servo_delay);
+            vTaskDelay(pdMS_TO_TICKS(servo_delay));
             seed_drop_finished = true;
         }
     }
