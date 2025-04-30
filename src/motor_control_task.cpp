@@ -75,7 +75,7 @@ void manual_motor_control_task(__unused void *params) {
 -------------------------------------------------------------------------*/
 
 //When disable Autonomous mode when about to hit an obstacle.
-bool tof_hat_detected_obstacle() {
+void tof_hat_detected_obstacle() {
     drive_mode = DriveMode::MANUAL;
 }
 

@@ -1,10 +1,10 @@
 #include "tof_sensor_task.h"
 
+#ifdef USING_VL53L0X
 constexpr uint8_t VL53L0X_I2C_ADDRES = 0x29;
 
 #ifdef TOF_HAT
 constexpr uint8_t SENSOR_COUNT = 1;
-
 #endif
 #ifndef TOF_HAT
 constexpr uint8_t SENSOR_COUNT = 2;
@@ -27,6 +27,7 @@ static void tof_sensor_setup() {
     #endif
 
     tof_sensor.setAddress(VL53L0X_I2C_ADDRES);
+    tof_sensor.init();
     if(tof_sensor.setMeasurementTimingBudget(20000) != true) {
         Serial.println("Failed to set vl53l0x timing budget.");
     }
@@ -34,7 +35,7 @@ static void tof_sensor_setup() {
 }
 
 
-void get_distance(uint16_t *distance) {
+static void get_distance(uint16_t *distance) {
     for(uint8_t i=0; i<SENSOR_COUNT; i++) {
         #ifndef TOF_HAT 
         digitalWrite(XSHUT_PINS[i], true); // set xshut high to read from sensor
@@ -49,7 +50,7 @@ void get_distance(uint16_t *distance) {
 }
 
 
-void process_distance(uint16_t *distance) {
+static void process_distance(uint16_t *distance) {
     if(SENSOR_COUNT==0) return;
     //sensor detecting obstacles in front of the robot. 
     if(SENSOR_COUNT==1) {
@@ -78,6 +79,10 @@ void tof_sensor_task(__unused void *params) {
     while (true) {
         if(drive_mode == DriveMode::AUTONOMOUS) {
             get_distance(distance);
+            process_distance(distance);
         }
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
+
+#endif

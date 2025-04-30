@@ -16,7 +16,7 @@ DriveMode drive_mode;
 
 
 void vLaunch() {
-    xTaskCreate(ps4_control_task, "PS4Task", PS4_TASK_STACK_DEPTH, NULL, PS4_TASK_PRIORITY, NULL);
+    // xTaskCreate(ps4_control_task, "PS4Task", PS4_TASK_STACK_DEPTH, NULL, PS4_TASK_PRIORITY, NULL);
 
     #ifdef USING_SERVO
     xTaskCreate(seed_release_task, "SeedTask", SEED_TASK_STACK_DEPTH, NULL, SEED_TASK_PRIORITY, NULL);
@@ -50,6 +50,7 @@ void vSemaphoreInit() {
 
 
 void setup() {
+  Wire.begin();
   Serial.begin(9600);
   vSemaphoreInit();
   vLaunch();

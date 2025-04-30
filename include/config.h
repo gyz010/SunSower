@@ -6,11 +6,11 @@
 #define PS4_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
 
 
-// #define USING_MOTOR
-// #define USING_VL53L0X
+#define USING_MOTOR
+#define USING_VL53L0X
 #define USING_ULTRASOUND
-// #define USING_UART
-// #define USING_SERVO
+#define USING_UART
+#define USING_SERVO
 
 
 
@@ -41,7 +41,7 @@
 //VL53L0X type
 #ifdef USING_VL53L0X
 #define TOF_HAT
-#define TOF_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 512
+#define TOF_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
 #define TOF_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
 
 #endif

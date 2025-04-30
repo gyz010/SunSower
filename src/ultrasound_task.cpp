@@ -1,5 +1,6 @@
 #include "ultrasound_task.h"
 
+#ifdef USING_ULTRASOUND
 
 static volatile int64_t left_start_time;
 static volatile int64_t right_start_time;
@@ -82,3 +83,4 @@ void ultrasound_task(__unused void *params) {
     }
     
 }
+#endif
