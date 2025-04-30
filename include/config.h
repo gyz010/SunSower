@@ -39,7 +39,7 @@
 #define I2C_SCL 22
 
 //VL53L0X type
-#ifdef VL53L0X
+#ifdef USING_VL53L0X
 #define TOF_HAT
 #define TOF_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 512
 #define TOF_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
