@@ -4,6 +4,7 @@
 #include "VL53L0X.h"
 #include "config.h"
 
+extern EventGroupHandle_t xAutonomousDriveEventGroup;
 
 void tof_sensor_task(__unused void *params);
 

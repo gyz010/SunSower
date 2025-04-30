@@ -6,8 +6,6 @@
 #include "config.h"
 
 
-#define PS4_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
-#define PS4_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
 
 extern xSemaphoreHandle xSeedSemaphore;
 extern xSemaphoreHandle xPS4Semaphore;

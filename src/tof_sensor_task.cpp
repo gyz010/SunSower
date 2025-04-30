@@ -2,9 +2,6 @@
 
 constexpr uint8_t VL53L0X_I2C_ADDRES = 0x29;
 
-
-
-#define TOF_HAT 0x29
 #ifdef TOF_HAT
 constexpr uint8_t SENSOR_COUNT = 1;
 
@@ -21,11 +18,13 @@ constexpr uint8_t XSHUT_PINS[SENSOR_COUNT] = {12, 13};
 static VL53L0X tof_sensor;
 
 static void tof_sensor_setup() {
-    //Set xshut pins low
-    // for(uint8_t i=0; i<SENSOR_COUNT; i++) {
-    //     pinMode(XSHUT_PINS[i], OUTPUT);
-    //     digitalWrite(XSHUT_PINS[i], false);
-    // }
+    // Set xshut pins low
+    #ifndef TOF_HAT
+    for(uint8_t i=0; i<SENSOR_COUNT; i++) {
+        pinMode(XSHUT_PINS[i], OUTPUT);
+        digitalWrite(XSHUT_PINS[i], false);
+    }
+    #endif
 
     tof_sensor.setAddress(VL53L0X_I2C_ADDRES);
     if(tof_sensor.setMeasurementTimingBudget(20000) != true) {
@@ -75,7 +74,7 @@ void process_distance(uint16_t *distance) {
 
 void tof_sensor_task(__unused void *params) {
     uint16_t distance[SENSOR_COUNT];
-    tof_sensor.readRangeSingleMillimeters();
+    tof_sensor_setup();
     while (true) {
         if(drive_mode == DriveMode::AUTONOMOUS) {
             get_distance(distance);

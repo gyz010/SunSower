@@ -1,5 +1,80 @@
 #pragma once
 
+
+
+#define PS4_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
+#define PS4_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+
+
+#define USING_MOTOR
+#define USING_VL53L0X
+// #define USING_ULTRASOUND
+#define USING_UART
+#define USING_SERVO
+
+
+
+
+//MOTOR
+#ifdef USING_MOTOR
+
+#define MOTOR_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
+#define MOTOR_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+
+#define MOT_LEFT_PIN_IN1 25
+#define MOT_LEFT_PIN_IN2 26
+#define MOT_LEFT_PIN_PWM 12
+#define MOT_LEFT_PWM_CH 0
+
+
+#define MOT_RIGHT_PIN_IN1 27
+#define MOT_RIGHT_PIN_IN2 14
+#define MOT_RIGHT_PIN_PWM 13
+#define MOT_RIGHT_PWM_CH 1
+
+#endif
+
+//I2C PINS
+#define I2C_SDA 21
+#define I2C_SCL 22
+
+//VL53L0X type
+#ifdef VL53L0X
+#define TOF_HAT
+#define TOF_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 512
+#define TOF_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+
+#endif
+
+
+//ULTRASOUND PINS
+#ifdef USING_ULTRASOUND
+#define ULTRASOUND_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 512
+#define ULTRASOUND_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+
+#define ULTRASOUND_TRIGGER 4
+#define ULTRASOUND_ECHO_LEFT 17
+#define ULTRASOUND_ECHO_RIGHT 16
+
+#endif
+
+//SERVO
+#ifdef USING_SERVO
+
+#define SEED_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 256
+#define SEED_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
+
+#define SERVO_PIN 2
+#endif
+
+//UART
+#ifdef USING_UART
+#define UART0_TX 1
+#define UART0_RX 3
+#endif
+
+
+
 enum class DriveMode {
     MANUAL,
     AUTONOMOUS

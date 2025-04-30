@@ -4,7 +4,6 @@
 bool seed_drop_finished = false;
 
 
-constexpr uint8_t SERVO_PIN = 2;
 constexpr uint8_t SERVO_CLOSED = 0;
 constexpr uint8_t SERVO_OPEN = 90;
 constexpr uint32_t SERVO_DELAY_MS = 500;

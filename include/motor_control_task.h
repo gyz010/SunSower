@@ -4,23 +4,8 @@
 #include "Arduino.h"
 #include "config.h"
 
-//DEFINE
-#define MOTOR_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
-#define MOTOR_TASK_PRIORITY ( tskIDLE_PRIORITY + 2UL )
-
-#define MOT_LEFT_PIN_IN1 23
-#define MOT_LEFT_PIN_IN2 22
-#define MOT_LEFT_PIN_PWM 17
-#define MOT_LEFT_PWM_CH 0
-
-#define MOT_RIGHT_PIN_IN1 19
-#define MOT_RIGHT_PIN_IN2 21
-#define MOT_RIGHT_PIN_PWM 16
-#define MOT_RIGHT_PWM_CH 1
  
-//Po jakiej stronie pojazdu są silniki (ma znaczenie przy wykonywaniu zakrętów)
-#define MOT_LEFT 0  
-#define MOT_RIGHT 1
+
 
 //Wartości knob poniżej KNOB_SENSITIVITY będą traktowane jako szum.
 #define KNOB_SENSITIVITY 5
