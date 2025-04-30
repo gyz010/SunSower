@@ -59,25 +59,24 @@ static void ultrasound_pin_setup() {
     gpio_isr_handler_add(ULTRASOUND_ECHO_RIGHT, gpio_isr_handler, (void*) ULTRASOUND_ECHO_RIGHT);
 }
 
-static void get_distance(uint32_t *distance) {
+static void get_distance(wall_distance *distance) {
     if(echo_back & 0b01) { //right sensor echo 
-        distance[1] = (echo_right_time * 343)/2000;
+        distance->right_distance = (echo_right_time * 343)/2000;
     }
     if(echo_back & 0b10) { //left sensor echo
-        distance[0] = (echo_left_time * 343)/2000;
+        distance->left_distance = (echo_left_time * 343)/2000;
     }
 }
 
 void ultrasound_task(__unused void *params) {
     ultrasound_pin_setup();
-    uint32_t distance[2] = {0}; //distance in mm
+    wall_distance distance = {0};
     while (true) {
         trigger_ultrasound();
         vTaskDelay(pdMS_TO_TICKS(30));
-        get_distance(distance);
+        get_distance(&distance);
 
-
-        distance[0] = distance[1] = 0;
+        distance.left_distance = distance.right_distance = 0;
         echo_back = 0b00;
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

@@ -4,6 +4,11 @@
 #include "Arduino.h"
 #include "config.h"
 
+struct wall_distance{
+    uint32_t left_distance;
+    uint32_t right_distance;
+};
+
 void ultrasound_task(__unused void *params);
 
 
