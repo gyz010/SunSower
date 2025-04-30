@@ -1,5 +1,8 @@
 #include "motor_control_task.h"
 #include "ps4_control_task.h"
+#include "ultrasound_task.h"
+
+#ifdef USING_MOTOR
 
 Motor::Motor(uint8_t in1, uint8_t in2, uint8_t pwm, uint8_t pwm_ch) : pin_in1(in1), pin_in2(in2), pin_pwm(pwm), pwm_ch(pwm_ch) {
     pinMode(pin_in1, OUTPUT);
@@ -49,10 +52,9 @@ motor_control_signal_t Motor::calculate_motor_output(int8_t forward, int8_t turn
     return {pwm_left, pwm_right, dir_left, dir_right};
 }
 
-#ifdef USING_MOTOR
 static Motor left(MOT_LEFT_PIN_IN1, MOT_LEFT_PIN_IN2, MOT_LEFT_PIN_PWM, MOT_LEFT_PWM_CH);
 static Motor right(MOT_RIGHT_PIN_IN1, MOT_RIGHT_PIN_IN2, MOT_RIGHT_PIN_PWM, MOT_RIGHT_PWM_CH);
-#endif
+
 
 void manual_motor_control_task(__unused void *params) {
 
@@ -75,26 +77,53 @@ void manual_motor_control_task(__unused void *params) {
 -------------------------------------------------------------------------*/
 
 //When disable Autonomous mode when about to hit an obstacle.
-void tof_hat_detected_obstacle() {
+static void tof_hat_detected_obstacle(steering_t *steering) {
+    steering->forward = 0;
+    steering->turn = 0;
     drive_mode = DriveMode::MANUAL;
+    
+}
+
+
+static void keep_robot_centered(wall_distance *reading, steering_t *steering) {
+    constexpr float Kp = 0.5;
+    int32_t error = int32_t(reading->left_distance) - int32_t(reading->right_distance);
+    int32_t steering_adjustment = Kp * error;
+
+    //(left_distance = 80mm, right_distance = 120mm) -> turn = -40*0.5 = -20 
+
+    //Clamping to [-128, 127]
+    if(steering_adjustment > 127) steering_adjustment = 127;
+    if(steering_adjustment < -128) steering_adjustment = -128;
+
+    steering->turn = steering_adjustment;
+    steering->forward = 127;
+
 }
 
 void autonomous_motor_control_task(__unused void *params) {
     EventBits_t uxBits;
-
-
+    struct wall_distance reading;
+    steering_t steering;
     while(true) {
         if(drive_mode == DriveMode::AUTONOMOUS) {
+            if(xQueueReceive(xUltraSoundReadings, &reading, 0)) {
+                keep_robot_centered(&reading, &steering);
+            }
             uxBits = xEventGroupWaitBits(
                 xAutonomousDriveEventGroup,
                 DISTANCE_ALERT_BIT,
                 pdTRUE,
                 pdFALSE,
-                portMAX_DELAY
+                0 //dont wait
             );
             if(uxBits & DISTANCE_ALERT_BIT) {
-                tof_hat_detected_obstacle();
+                tof_hat_detected_obstacle(&steering);
             }
+            motor_control_signal_t signal = Motor::calculate_motor_output(steering.forward, steering.turn);    
+            left.update(signal.dir_left, signal.pwm_left);
+            right.update(signal.dir_right, signal.pwm_right);
         }
     }
 }
+#endif

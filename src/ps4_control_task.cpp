@@ -1,14 +1,14 @@
 #include "ps4_control_task.h"
 
-void on_connect() {
+static void on_connect() {
     Serial.println("Connected");
 }
 
-void on_disconnect() {
+static void on_disconnect() {
     Serial.println("Disconnected");
 }
 
-void ps4_callback() {
+static void ps4_callback() {
     xSemaphoreGive(xPS4Semaphore);
 }
 
@@ -25,11 +25,11 @@ void ps4_control_task(__unused void *params) {
     bool send_motor_data = true;
     while(true) {
         if(xSemaphoreTake(xPS4Semaphore, portMAX_DELAY)) {
-            if(PS4.Triangle() and seed_drop_finished) {
+            if(PS4.Triangle() && seed_drop_finished) {
                 xSemaphoreGive(xSeedSemaphore);
             }
             
-            if(PS4.Cross()){
+            if(drive_mode == DriveMode::MANUAL && PS4.Cross()){
                 send_motor_data = true;
                 knob_value =
                 {
@@ -41,11 +41,20 @@ void ps4_control_task(__unused void *params) {
                 xQueueSend(xMotorControlQueue, &knob_value, 0);
             }
             //Pojedyncze wyzerowanie sygnalu na silnikach
-            else if(send_motor_data) {
+            else if(drive_mode == DriveMode::MANUAL && send_motor_data) {
                 send_motor_data = false;
                 knob_value = {0};
                 xQueueSend(xMotorControlQueue, &knob_value, 0);
             }
+            //Przełączanie między trybem automatycznym a manualnym
+            if(PS4.Circle()) {
+                drive_mode = DriveMode::MANUAL;
+            }
+            if(PS4.Square()) {
+                drive_mode = DriveMode::AUTONOMOUS;
+            }
+
+
       }
       vTaskDelay(100);
     }

@@ -9,6 +9,8 @@ struct wall_distance{
     uint32_t right_distance;
 };
 
+extern xQueueHandle xUltraSoundReadings;
+
 void ultrasound_task(__unused void *params);
 
 

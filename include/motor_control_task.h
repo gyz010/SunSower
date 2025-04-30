@@ -13,6 +13,7 @@
 
 extern xQueueHandle xMotorControlQueue;
 extern EventGroupHandle_t xAutonomousDriveEventGroup;
+extern xQueueHandle xUltraSoundReadings;
 
 typedef struct {
     uint8_t pwm_left;
@@ -20,6 +21,12 @@ typedef struct {
     bool dir_left;
     bool dir_right;
 } motor_control_signal_t;
+
+
+typedef struct {
+    int8_t forward;
+    int8_t turn; //positive: left | negative: right
+} steering_t;
 
 
 class Motor {

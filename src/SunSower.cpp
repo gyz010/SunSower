@@ -9,6 +9,7 @@ xSemaphoreHandle xSeedSemaphore;
 xSemaphoreHandle xPS4Semaphore;
 
 xQueueHandle xMotorControlQueue;
+xQueueHandle xUltraSoundReadings;
 EventGroupHandle_t xAutonomousDriveEventGroup;
 xSemaphoreHandle xDetectedObstacleFront;
 
@@ -16,7 +17,7 @@ DriveMode drive_mode;
 
 
 void vLaunch() {
-    // xTaskCreate(ps4_control_task, "PS4Task", PS4_TASK_STACK_DEPTH, NULL, PS4_TASK_PRIORITY, NULL);
+    xTaskCreate(ps4_control_task, "PS4Task", PS4_TASK_STACK_DEPTH, NULL, PS4_TASK_PRIORITY, NULL);
 
     #ifdef USING_SERVO
     xTaskCreate(seed_release_task, "SeedTask", SEED_TASK_STACK_DEPTH, NULL, SEED_TASK_PRIORITY, NULL);
@@ -42,6 +43,7 @@ void vSemaphoreInit() {
   xSeedSemaphore = xSemaphoreCreateBinary();
   xPS4Semaphore = xSemaphoreCreateBinary();
   xMotorControlQueue = xQueueCreate(4, sizeof(knob_values));
+  xUltraSoundReadings = xQueueCreate(4, sizeof(wall_distance));
 
   xAutonomousDriveEventGroup = xEventGroupCreate();
 }

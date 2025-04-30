@@ -8,6 +8,7 @@ static volatile int64_t echo_left_time;
 static volatile int64_t echo_right_time;
 static volatile uint8_t echo_back = 0b00;
 
+//Trigger pin na wysokim aby czujnik sie załączył
 static void trigger_ultrasound() {
     digitalWrite(ULTRASOUND_TRIGGER, true);
     delayMicroseconds(10);
@@ -72,13 +73,20 @@ void ultrasound_task(__unused void *params) {
     ultrasound_pin_setup();
     wall_distance distance = {0};
     while (true) {
-        trigger_ultrasound();
-        vTaskDelay(pdMS_TO_TICKS(30));
-        get_distance(&distance);
+        if(drive_mode == DriveMode::AUTONOMOUS){
+            //Odczyt
+            trigger_ultrasound();
+            vTaskDelay(pdMS_TO_TICKS(30));
+            get_distance(&distance);
 
-        distance.left_distance = distance.right_distance = 0;
-        echo_back = 0b00;
-        vTaskDelay(pdMS_TO_TICKS(1000));
+            //Wysylanie odczytu do sterowania
+            xQueueSend(xUltraSoundReadings, &distance, 0);
+
+            //Reset odczytow
+            distance.left_distance = distance.right_distance = 0;
+            echo_back = 0b00;
+        }
+        else vTaskDelay(50);
     }
     
 }
