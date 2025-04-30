@@ -2,6 +2,7 @@
 #include "ps4_control_task.h"
 #include "seed_release_task.h"
 #include "tof_sensor_task.h"
+#include "ultrasound_task.h"
 
 
 xSemaphoreHandle xSeedSemaphore;
@@ -10,6 +11,8 @@ xSemaphoreHandle xPS4Semaphore;
 xQueueHandle xMotorControlQueue;
 EventGroupHandle_t xAutonomousDriveEventGroup;
 xSemaphoreHandle xDetectedObstacleFront;
+
+DriveMode drive_mode;
 
 
 void vLaunch() {

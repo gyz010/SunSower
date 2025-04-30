@@ -49,8 +49,10 @@ motor_control_signal_t Motor::calculate_motor_output(int8_t forward, int8_t turn
     return {pwm_left, pwm_right, dir_left, dir_right};
 }
 
+#ifdef USING_MOTOR
 static Motor left(MOT_LEFT_PIN_IN1, MOT_LEFT_PIN_IN2, MOT_LEFT_PIN_PWM, MOT_LEFT_PWM_CH);
 static Motor right(MOT_RIGHT_PIN_IN1, MOT_RIGHT_PIN_IN2, MOT_RIGHT_PIN_PWM, MOT_RIGHT_PWM_CH);
+#endif
 
 void manual_motor_control_task(__unused void *params) {
 
@@ -58,9 +60,11 @@ void manual_motor_control_task(__unused void *params) {
     while(true) {
 
         if(drive_mode == DriveMode::MANUAL && xQueueReceive(xMotorControlQueue, &knob_value, portMAX_DELAY) == pdTRUE) {
+            #ifdef USING_MOTOR
             motor_control_signal_t signal = Motor::calculate_motor_output(knob_value.left_y, knob_value.left_x);    
             left.update(signal.dir_left, signal.pwm_left);
             right.update(signal.dir_right, signal.pwm_right);
+            #endif
         }
     }
 }

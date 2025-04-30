@@ -3,12 +3,15 @@
 
 bool seed_drop_finished = false;
 
+#ifdef USING_SERVO
 
 constexpr uint8_t SERVO_CLOSED = 0;
 constexpr uint8_t SERVO_OPEN = 90;
 constexpr uint32_t SERVO_DELAY_MS = 500;
 
 static Servo servo;
+
+
 
 void seed_drop() {
     seed_drop_finished = false;
@@ -33,3 +36,5 @@ void seed_release_task(__unused void *params) {
         }
     }
 }
+
+#endif
