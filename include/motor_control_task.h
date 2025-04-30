@@ -2,6 +2,7 @@
 #define MOTOR_CONTROL_TASK_H
 
 #include "Arduino.h"
+#include "config.h"
 
 //DEFINE
 #define MOTOR_TASK_STACK_DEPTH configMINIMAL_STACK_SIZE + 2048
@@ -24,7 +25,9 @@
 //Wartości knob poniżej KNOB_SENSITIVITY będą traktowane jako szum.
 #define KNOB_SENSITIVITY 5
 
+
 extern xQueueHandle xMotorControlQueue;
+extern EventGroupHandle_t xAutonomousDriveEventGroup;
 
 typedef struct {
     uint8_t pwm_left;
@@ -44,8 +47,7 @@ public:
     static motor_control_signal_t calculate_motor_output(int8_t forward, int8_t turn);
 };
 
-void motor_control_task(__unused void *params);
-
-
+void manual_motor_control_task(__unused void *params);
+void autonomous_motor_control_task(__unused void *params);
 
 #endif //MOTOR_CONTROL_TASK_H
