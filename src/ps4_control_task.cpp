@@ -6,6 +6,7 @@ static void on_connect() {
 
 static void on_disconnect() {
     Serial.println("Disconnected");
+    disable_motors();
 }
 
 static void ps4_callback() {

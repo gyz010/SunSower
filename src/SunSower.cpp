@@ -13,7 +13,7 @@ xQueueHandle xUltraSoundReadings;
 EventGroupHandle_t xAutonomousDriveEventGroup;
 xSemaphoreHandle xDetectedObstacleFront;
 
-DriveMode drive_mode;
+DriveMode drive_mode = DriveMode::MANUAL;
 
 
 void vLaunch() {

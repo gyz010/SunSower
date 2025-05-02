@@ -22,8 +22,6 @@ struct knob_values{
 
 
 void ps4_control_task(__unused void *params);
-void on_connect();
-void on_disconnect();
-
+void disable_motors();
 
 #endif //PS4_CONTROL_TASK_H
