@@ -25,11 +25,21 @@ void seed_drop() {
     seed_drop_finished = true;
 }
 
+static void autonomous_release(__unused void *params) {
+    constexpr uint32_t SERVO_TIMER_AUTONOMOUS = 5000;
+    while(true) {
+        if(drive_mode == DriveMode::AUTONOMOUS) {
+            xSemaphoreGive(xSeedSemaphore);
+        }
+        vTaskDelay(pdMS_TO_TICKS(SERVO_TIMER_AUTONOMOUS));
+    }
+}
+
 void seed_release_task(__unused void *params) {
     servo.attach(SERVO_PIN);
     servo.write(SERVO_CLOSED);
     seed_drop_finished = true;
-
+    xTaskCreate(autonomous_release, "AutoRelease", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
     while (true) {
         if (xSemaphoreTake(xSeedSemaphore, portMAX_DELAY) == pdTRUE) {
             seed_drop();
