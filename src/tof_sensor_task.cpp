@@ -17,7 +17,7 @@ constexpr uint8_t XSHUT_PINS[SENSOR_COUNT] = {12, 13};
 
 static VL53L0X tof_sensor;
 
-static void tof_sensor_setup() {
+static bool tof_sensor_setup() {
     // Set xshut pins low
     #ifndef TOF_HAT
     for(uint8_t i=0; i<SENSOR_COUNT; i++) {
@@ -27,11 +27,11 @@ static void tof_sensor_setup() {
     #endif
 
     tof_sensor.setAddress(VL53L0X_I2C_ADDRES);
-    tof_sensor.init();
-    if(tof_sensor.setMeasurementTimingBudget(20000) != true) {
-        Serial.println("Failed to set vl53l0x timing budget.");
-    }
-
+    bool success = tof_sensor.init();
+    // if(tof_sensor.setMeasurementTimingBudget(20000) != true) {
+    //     Serial.println("Failed to set vl53l0x timing budget.");
+    // }
+    return success;
 }
 
 
@@ -56,7 +56,8 @@ static void process_distance(uint16_t *distance) {
     if(SENSOR_COUNT==1) {
         constexpr uint16_t distance_toleration = 100;
         if(*distance < distance_toleration) {
-            xEventGroupSetBits(xAutonomousDriveEventGroup, DISTANCE_ALERT_BIT);
+            xSemaphoreGive(xTOFObstacleSemaphore);
+            Serial.println("xTOFObstacle given");
         }
 
     }
@@ -75,8 +76,20 @@ static void process_distance(uint16_t *distance) {
 
 void tof_sensor_task(__unused void *params) {
     uint16_t distance[SENSOR_COUNT];
-    tof_sensor_setup();
+    bool success = tof_sensor_setup();
+    constexpr uint8_t max_retries = 8;
+    uint8_t attempt = 0;
     while (true) {
+        if(!success && attempt < max_retries) {
+            attempt++;
+            Serial.printf("TOF retry: %d", attempt);
+            success = tof_sensor_setup();
+            continue;
+        }
+        if(success == max_retries) {
+            Serial.printf("TOF FAIL");
+            vTaskDelete(NULL);
+        }
         if(drive_mode == DriveMode::AUTONOMOUS) {
             get_distance(distance);
             process_distance(distance);

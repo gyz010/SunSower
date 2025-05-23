@@ -27,7 +27,8 @@ void Motor::update(bool dir, uint8_t duty) {
 }
 
 motor_control_signal_t Motor::calculate_motor_output(int8_t forward, int8_t turn) {
-    const int max_pwm = 255;
+    const int max_pwm = 255 ;
+    const int min_pwm = 10;
     // Normalizowanie
     float norm_forward = forward/127.f;
     float norm_turn = turn/127.f;
@@ -43,6 +44,9 @@ motor_control_signal_t Motor::calculate_motor_output(int8_t forward, int8_t turn
     // Konwersja do PWM
     uint8_t pwm_left = (uint8_t)(fabs(left_motor) * max_pwm);
     uint8_t pwm_right = (uint8_t)(fabs(right_motor) * max_pwm);
+
+    if(pwm_left<min_pwm) pwm_left=0;
+    if(pwm_right<min_pwm) pwm_right=0;
 
     // Kierunek (naprzód / wstecz)
     bool dir_left = (left_motor >= 0);
@@ -69,6 +73,7 @@ void manual_motor_control_task(__unused void *params) {
             motor_control_signal_t signal = Motor::calculate_motor_output(knob_value.left_y, knob_value.left_x);    
             left.update(signal.dir_left, signal.pwm_left);
             right.update(signal.dir_right, signal.pwm_right);
+            // Serial.printf("LEFT %d, RIGHT %d\n%d, %d\n", signal.dir_left, signal.dir_right, signal.pwm_left, signal.pwm_right);
         }
     }
 }
@@ -83,6 +88,7 @@ static void tof_hat_detected_obstacle(steering_t *steering) {
     steering->forward = 0;
     steering->turn = 0;
     drive_mode = DriveMode::MANUAL;
+    Serial.println("OBSTACLE DETECTED: MANUAL MODE ON");
     
 }
 
@@ -112,20 +118,15 @@ void autonomous_motor_control_task(__unused void *params) {
             if(xQueueReceive(xUltraSoundReadings, &reading, 0)) {
                 keep_robot_centered(&reading, &steering);
             }
-            uxBits = xEventGroupWaitBits(
-                xAutonomousDriveEventGroup,
-                DISTANCE_ALERT_BIT,
-                pdTRUE,
-                pdFALSE,
-                0 //dont wait
-            );
-            if(uxBits & DISTANCE_ALERT_BIT) {
+            if(xSemaphoreTake(xTOFObstacleSemaphore, 0) == pdTRUE) {
                 tof_hat_detected_obstacle(&steering);
             }
+            
             motor_control_signal_t signal = Motor::calculate_motor_output(steering.forward, steering.turn);    
             left.update(signal.dir_left, signal.pwm_left);
             right.update(signal.dir_right, signal.pwm_right);
         }
+        vTaskDelay(10);
     }
 }
 #endif

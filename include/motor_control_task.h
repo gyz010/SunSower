@@ -12,8 +12,10 @@
 
 
 extern xQueueHandle xMotorControlQueue;
-extern EventGroupHandle_t xAutonomousDriveEventGroup;
+// extern EventGroupHandle_t xAutonomousDriveEventGroup;
 extern xQueueHandle xUltraSoundReadings;
+extern xSemaphoreHandle xTOFObstacleSemaphore;
+
 
 typedef struct {
     uint8_t pwm_left;

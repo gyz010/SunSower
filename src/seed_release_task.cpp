@@ -6,8 +6,9 @@ bool seed_drop_finished = false;
 #ifdef USING_SERVO
 
 constexpr uint8_t SERVO_CLOSED = 0;
-constexpr uint8_t SERVO_OPEN = 90;
-constexpr uint32_t SERVO_DELAY_MS = 500;
+constexpr uint8_t SERVO_OPEN = 30;
+constexpr uint32_t SERVO_DELAY_MS = 200;
+constexpr uint32_t COOLDOWN = 1000;
 
 static Servo servo;
 
@@ -20,6 +21,7 @@ void seed_drop() {
     vTaskDelay(pdMS_TO_TICKS(SERVO_DELAY_MS));
     servo.write(SERVO_CLOSED);
     vTaskDelay(pdMS_TO_TICKS(SERVO_DELAY_MS));
+    vTaskDelay(pdMS_TO_TICKS(COOLDOWN));
     seed_drop_finished = true;
 }
 
